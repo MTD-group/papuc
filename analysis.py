@@ -6,8 +6,9 @@ from scipy.interpolate import splrep, splev
 
 from colorspacious import cspace_convert
 
-from tools import periodic_spline, periodic_spline_test, isoluminant_uniform_spline_colormap
-from tools import HSV_colormap, default_colorspace
+
+from papuc import periodic_spline, periodic_spline_test
+from papuc import isoluminant_uniform_spline_colormap, default_colorspace
 
 if False:
 	periodic_spline_test()
@@ -303,7 +304,7 @@ def plot_analytic_vortex_test_data(ax, my_map, npts = 16, xmax = 1.5, ymax = 1.7
 
 
 
-def cyclic_colormap_test(a_knots, b_knots, L_max, name, show_output = False, color_space = default_colorspace, ab_grid = 512):
+def cyclic_colormap_test(a_knots, b_knots, L_max, name, show_output = False, color_space = default_colorspace, ab_grid = 512, test_theta = None, test_magnitude = None, save_results = True):
 
 
 
@@ -341,38 +342,30 @@ def cyclic_colormap_test(a_knots, b_knots, L_max, name, show_output = False, col
 	plot_small_wave_angle_test(axes[0,2], my_map)
 	plot_small_wave_magnitude_test(axes[1,2], my_map)
 
-	if False:
-		plot_analytic_vortex_test_data(axes[2,0], my_map)
-		axes[2,0].set_title('This Map')
-
-		plot_analytic_vortex_test_data(axes[2,2], my_map, with_deuteranomaly = True)
-		axes[2,2].set_title('Deuteranomaly')
-
-	else:
+	try: # this is a terrible method to test if there is data, but I'm lazy and it's clean looking
 		########### sample data!
-		from numpy import loadtxt
-
-		z_array = loadtxt('example_data/magnitudes.txt')
-		theta_array = loadtxt('example_data/theta_angles.txt')
-
-		image = my_map(theta_array, z_array)
+		image = my_map(test_theta, test_magnitude)
 		cvd_space = {"name": "sRGB1+CVD",
 				"cvd_type": "deuteranomaly",
 				"severity": 50}
 		deut_image =clip( cspace_convert(image, cvd_space, "sRGB1"),  0,1)
-
-
+		
 		axes[2,0].imshow(image, origin = 'lower')
-		axes[2,0].set_title('This Map')
-
 		axes[2,2].imshow(deut_image, origin = 'lower')
-		axes[2,2].set_title('Deuteranomaly')
+
+	except:
+		plot_analytic_vortex_test_data(axes[2,0], my_map)
+		plot_analytic_vortex_test_data(axes[2,2], my_map, with_deuteranomaly = True)
+		
+	axes[2,0].set_title('This Map')
+	axes[2,2].set_title('Deuteranomaly')
 
 
 	fig.tight_layout(pad =0.1)
 	fig.subplots_adjust(top = 0.95)
-	fig.savefig(my_map.name+'_colormap.pdf',transparent = True, dpi =1200)
-	fig.savefig(my_map.name+'_colormap.svg',transparent = True, dpi =1200)
+	if save_results:
+		fig.savefig(my_map.name+'_colormap.pdf',transparent = True, dpi =1200)
+		fig.savefig(my_map.name+'_colormap.svg',transparent = True, dpi =1200)
 	########
 	if show_output:show()
 
@@ -395,4 +388,11 @@ if __name__ == "__main__":
 	a_knots = center[0] + radius*cos(theta + HSV_ab_angle0)
 	b_knots = center[1] + radius*sin(theta + HSV_ab_angle0)
 
-	cyclic_colormap_test(a_knots, b_knots, L_max, name, show_output = True)
+	from numpy import loadtxt
+	test_magnitude = loadtxt('example_data/magnitudes.txt')
+	test_theta = loadtxt('example_data/theta_angles.txt')
+
+	cyclic_colormap_test(a_knots, b_knots, L_max, name, 
+		show_output = True, save_results = False,
+		test_magnitude = test_magnitude,
+		test_theta = test_theta)

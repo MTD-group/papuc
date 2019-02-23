@@ -44,7 +44,7 @@ angle_norm     = angle/(2*pi)
 
 
 
-from tools import isoluminant_uniform_spline_colormap
+from papuc import isoluminant_uniform_spline_colormap
 ## in CAM02-UCS coordinates be default
 L_max = 73
 radius = 26
@@ -73,7 +73,7 @@ quiver(X, Y, U, V, units='width')
 ### this is for looking at your colormap's color wheel and color path
 #figure('Color Wheel and Color Path')
 fig, axes = subplots(ncols=2, num='Color Wheel and Color Path')
-from analysis import plot_knots_on_isoluminant_slice, plot_colorwheel
+from papuc import plot_knots_on_isoluminant_slice, plot_colorwheel
 plot_colorwheel(axes[0], my_map)
 plot_knots_on_isoluminant_slice(axes[1], my_map)
 fig.tight_layout(pad= 0.1)

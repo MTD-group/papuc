@@ -2,7 +2,7 @@
 
 from colorspacious import cspace_convert
 from colorsys import hsv_to_rgb
-from analysis import cyclic_colormap_test
+from papuc import cyclic_colormap_test
 from numpy import *
 
 jab_color = cspace_convert(hsv_to_rgb(0.0,1.0,1.0),"sRGB1",  "CAM02-UCS")

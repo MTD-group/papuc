@@ -71,16 +71,30 @@ def periodic_spline_test():
 
 
 class isoluminant_uniform_spline_colormap:
-	def __init__(self,a_knots, b_knots, L_max,
-		delta_E_model = '',
-		abs_cumulative_error_cutoff = 0.01, initial_arclen_npts = 4, color_space = default_colorspace ):
+	def __init__(self,a_knots, b_knots, L_max, name = 'my_colormap',
+		delta_E_model = '', initial_arclen_npts = None, maximize_radius = False,  color_space = default_colorspace, verbose = False ):
 
 		self.color_space = color_space # you can also use "CIELab"
+		self.L_max = L_max
+		self.name = name
 
-		#abs_cumulative_error_cutoff = 0.01 # about 1% of what a human could even detect!
-		#initial_arclen_npts = 4 pretty coarse
+		assert len(a_knots) == len(b_knots)
 
-		#print('\n-->testing %s\n'%name)
+		if initial_arclen_npts is None:
+			self.initial_arclen_npts = len(a_knots)
+		else:
+			self.initial_arclen_npts = initial_arclen_npts
+
+		self.update_knots( a_knots = a_knots, b_knots = b_knots, verbose = verbose  )
+
+		if maximize_radius:
+			self.maximize_radius( verbose = verbose)
+
+	def update_knots(self, a_knots, b_knots, abs_cumulative_error_cutoff = 0.01, verbose = True):
+
+		self.a_knots = np.asarray(a_knots)
+		self.b_knots = np.asarray(b_knots)
+
 		t_knots =  np.arange(0,1.0, 1.0/len(a_knots))
 		a_func, a_func_prime = periodic_spline(t_knots, a_knots, period = 1.0 )
 		b_func, b_func_prime = periodic_spline(t_knots, b_knots, period = 1.0 )
@@ -93,7 +107,7 @@ class isoluminant_uniform_spline_colormap:
 		# you only cared about arc length this a good metric, we need the integrand
 		#arc_len_quad, quad_error = quad(differtial_arc, 0, 1)
 
-		t_pts = initial_arclen_npts
+		t_pts = self.initial_arclen_npts
 		t_knots_fine, dt = np.linspace(0, 1.0, t_pts, retstep=True)
 		cum_int  = cumtrapz(differtial_arc(t_knots_fine), dx = dt, initial = 0.0)
 		#abs_error = abs(cum_int[-1]- arc_len_quad)
@@ -102,20 +116,20 @@ class isoluminant_uniform_spline_colormap:
 
 		while abs_error > abs_cumulative_error_cutoff:
 			cum_int_old = cum_int
-			t_pts = t_pts*2
+			t_pts = t_pts*2-1
 			t_knots_fine, dt = np.linspace(0, 1.0, t_pts, retstep=True)
 			cum_int  = cumtrapz(differtial_arc(t_knots_fine),dx = dt, initial = 0.0)
 			abs_error = abs(cum_int[-1] - cum_int_old[-1])
 
-			print('Pathlength Error %0.3e t_pts %i'%( abs_error, t_pts))
+			if verbose: print('Pathlength Error %0.3e t_pts %i'%( abs_error, t_pts))
 
 		self.min_t_pts = t_pts
 
-		print('Previous Arc Length %0.3e Current Arc Length %0.3e t_pts %i'%( cum_int_old[-1], cum_int[-1],  t_pts))
+		if verbose: print('Previous Arc Length %0.3e Current Arc Length %0.3e t_pts %i'%( cum_int_old[-1], cum_int[-1],  t_pts))
 
 		self.arc_length = cum_int[-1]
 
-		print('arc len',self.arc_length)
+		if verbose: print('arc len',self.arc_length)
 		theta_knots_fine =  cum_int/(self.arc_length)*2*np.pi
 
 		from scipy.interpolate import interp1d
@@ -149,23 +163,23 @@ class isoluminant_uniform_spline_colormap:
 			return  b_func(func_t_of_theta(theta))
 		self.b_func_of_theta = b_func_of_theta
 
-		self.L_max = L_max
-		self.a_knots = a_knots
-		self.b_knots = b_knots
+
 		self.theta_knots = func_theta_of_t(t_knots)
 
-		self.compute_min_theta_points_for_uniformity()
+		self.compute_min_theta_points_for_uniformity(verbose = verbose)
 
 
-	def compute_min_theta_points_for_uniformity(self, JND = None, max_delta_E_deviation = 1.0):
+
+
+	def compute_min_theta_points_for_uniformity(self, JND = None, max_delta_E_deviation = 1.0, verbose = True):
 
 		if JND == None:
 			max_delta_E = 10.0
 		else:
 			max_delta_E = JND
 		###### how many theta_knots do we need? this computes it
-		theta_pts =  len(self.a_knots)*2+1
-		theta_knots_fine, dtheta = np.linspace(0, 1.0, theta_pts, retstep=True)
+		theta_pts =  len(self.a_knots)*2-1 #number of point plus bisecting points
+		theta_knots_fine, dtheta = np.linspace(0, 2*np.pi, theta_pts, retstep=True)
 		delta_a =  np.diff(self.a_func_of_theta(theta_knots_fine))
 		delta_b =  np.diff(self.b_func_of_theta(theta_knots_fine))
 		dE =  np.sqrt(delta_a**2 + delta_b**2)# scalling by 1/dtheta was ugly
@@ -174,12 +188,12 @@ class isoluminant_uniform_spline_colormap:
 		max_above = dE.max()-mean_dE
 		min_below = mean_dE - dE.min()
 		#print('mean_delta_E', mean_dE, 'max_above', max_above, 'min_below', min_below, 'uniform_maping theta_pts', theta_pts  )
-		print('mean_delta_E %0.3e max_above %0.3e min_below %0.3e uniform_maping theta_pts %i'%( mean_dE, max_above, min_below, theta_pts  ))
+		if verbose: print('mean_delta_E %0.3e max_above %0.3e min_below %0.3e uniform_maping theta_pts %i'%( mean_dE, max_above, min_below, theta_pts  ))
 
 
 		while max(max_above,min_below) > max_delta_E_deviation or dE.max() > max_delta_E:
-			theta_pts = theta_pts*2
-			theta_knots_fine, dtheta = np.linspace(0, 1.0, theta_pts, retstep=True)
+			theta_pts = theta_pts*2-1
+			theta_knots_fine, dtheta = np.linspace(0, 2*np.pi, theta_pts, retstep=True)
 			delta_a =  np.diff(self.a_func_of_theta(theta_knots_fine))
 			delta_b =  np.diff(self.b_func_of_theta(theta_knots_fine))
 			dE =  np.sqrt(delta_a**2 + delta_b**2)
@@ -187,11 +201,50 @@ class isoluminant_uniform_spline_colormap:
 			mean_dE =    np.mean(dE)
 			max_above = dE.max()-mean_dE
 			min_below = mean_dE - dE.min()
-			print('mean_delta_E %0.3e max_above %0.3e min_below %0.3e uniform_maping theta_pts %i'%( mean_dE, max_above, min_below, theta_pts  ))
+			if verbose: print('mean_delta_E %0.3e max_above %0.3e min_below %0.3e uniform_maping theta_pts %i'%( mean_dE, max_above, min_below, theta_pts  ))
 			#print('mean_delta_E', mean_dE, 'max_above', max_above, 'min_below', min_below, 'uniform_maping theta_pts', theta_pts  )
 
 		self.min_theta_pts = theta_pts
 		return dE
+
+
+	def maximize_radius(self, cut_off = 0.05, fineness = 2, verbose=False):
+		# fineness should improve quality of maximization, but it keeps crashing
+		#theta_knots_fine = np.linspace(0, 2*np.pi, self.min_theta_pts*fineness  )
+		theta_knots_fine = np.linspace(0, 2*np.pi, self.min_theta_pts  )
+		a_fine =  self.a_func_of_theta(theta_knots_fine)
+		b_fine =  self.b_func_of_theta(theta_knots_fine)
+
+		scale = np.sqrt(a_fine**2+b_fine**2).max()
+		a_scaled = a_fine/scale
+		b_scaled = b_fine/scale
+
+		L_scaled = np.ones(self.min_theta_pts)*self.L_max
+
+		radius_min = 0 # radius is used for the outermost radius scale
+		radius_max = 128
+		while (radius_max - radius_min) > cut_off:
+			radius = 0.5*(radius_max + radius_min)
+
+			lab_color_sequence = np.array([L_scaled, radius * a_scaled, radius * b_scaled]).T
+			sequence = cspace_convert(lab_color_sequence, self.color_space, "sRGB1")
+
+			if np.any(sequence>1.0) or np.any(sequence<0.0):
+				radius_is_safe = False
+				if verbose:print (radius_min, radius, radius_max, radius_is_safe)
+				radius_max = radius
+
+			else:
+				radius_is_safe = True
+				if verbose:print (radius_min, radius, radius_max, radius_is_safe)
+				radius_min = radius
+
+
+		# use the same scale as above since it uses finer points to for finding max size that fits in rgb space
+		new_a_knots = self.a_knots/scale * radius
+		new_b_knots = self.b_knots/scale * radius
+
+		self.update_knots( a_knots = new_a_knots, b_knots = new_b_knots, verbose = verbose  )
 
 	def __call__(self, theta, z, scale_alpha = False, clip_values = True, verbose = True):
 
@@ -251,7 +304,7 @@ class isoluminant_uniform_spline_colormap:
 
 
 class isoluminant_uniform_circle_colormap:
-	def __init__(self, radius = 40, L_max = 74, theta0 = 0.0, use_max_radius = True, color_space = default_colorspace):
+	def __init__(self, radius = 40, L_max = 74, theta0 = 0.0, use_max_radius = False, color_space = default_colorspace, verbose = False):
 		self.radius = radius
 		self.L_max = L_max
 		self.theta0 = theta0
@@ -262,9 +315,9 @@ class isoluminant_uniform_circle_colormap:
 		self.min_theta_pts = None
 
 		if use_max_radius:
-			self.maximize_radius
+			self.maximize_radius(verbose  = verbose)
 
-	def maximize_radius(self,cut_off = 0.1, verbose=False):
+	def maximize_radius(self,cut_off = 0.05, verbose=False):
 		radius_max = 128.0
 		radius_min = 0.0
 		dE = 2*pi*cut_off # same spatial sampling, or something, I just made this up, it seems to work

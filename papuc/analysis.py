@@ -6,9 +6,8 @@ import numpy as np
 from scipy.interpolate import splrep, splev
 
 from colorspacious import cspace_convert
+from papuc.core import default_colorspace
 
-from papuc.tools import periodic_spline, periodic_spline_test, isoluminant_uniform_spline_colormap
-from papuc.tools import HSV_colormap, default_colorspace
 
 if False:
 	periodic_spline_test()
@@ -66,7 +65,7 @@ def plot_knots_on_isoluminant_slice(ax, my_map, ab_grid=512):
 
 		use_image = True
 		if use_image:
-			print('making image')
+			#print('making image')
 			da = (amax-amin)/na_grid
 			db = (bmax-bmin)/nb_grid
 			a_points = np.linspace(amin+da/2, amax-da/2, na_grid)
@@ -322,16 +321,14 @@ def plot_analytic_vortex_test_data(ax, my_map, npts = 16, xmax = 1.5, ymax = 1.7
 
 
 
-def cyclic_colormap_test(a_knots, b_knots, L_max, name, show_output = False, color_space = default_colorspace, ab_grid = 512):
+def cyclic_colormap_test(my_map, show_output = False, color_space = default_colorspace, ab_grid = 512):
 
 
 
-	print('\n-->testing %s\n'%name)
+	print('\n-->testing %s\n'%my_map.name)
 
-	my_map = isoluminant_uniform_spline_colormap(a_knots, b_knots, L_max, color_space = color_space)
-	#my_map.min_theta_pts
 
-	my_map.name = name
+
 
 	from matplotlib.pylab import subplots, show, subplot
 	nrows = 3
@@ -339,6 +336,36 @@ def cyclic_colormap_test(a_knots, b_knots, L_max, name, show_output = False, col
 	subsize = 3.0
 	fig, axes =  subplots(nrows=nrows,  ncols=ncols, figsize=(subsize*ncols, subsize*nrows))
 	fig.suptitle(my_map.name, fontsize = 14)
+
+
+	if False:
+		plot_analytic_vortex_test_data(axes[2,0], my_map)
+		axes[2,0].set_title('This Map')
+
+		plot_analytic_vortex_test_data(axes[2,2], my_map, with_deuteranomaly = True)
+		axes[2,2].set_title('Deuteranomaly')
+
+	else:
+		########### sample data!
+		from papuc.example_data.magnitudes import magnitudes
+		from papuc.example_data.theta_angles import theta_angles
+		from io import StringIO
+		z_array = np.loadtxt(StringIO(magnitudes))
+		theta_array = np.genfromtxt(StringIO(theta_angles))
+
+		image = my_map(theta_array*2*np.pi, z_array)
+		cvd_space = {"name": "sRGB1+CVD",
+				"cvd_type": "deuteranomaly",
+				"severity": 50}
+		deut_image = np.clip( cspace_convert(image, cvd_space, "sRGB1"),  0,1)
+
+
+		axes[2,0].imshow(image, origin = 'lower')
+		axes[2,0].set_title('This Map')
+
+		axes[2,2].imshow(deut_image, origin = 'lower')
+		axes[2,2].set_title('Deuteranomaly')
+
 
 
 	plot_knots_on_isoluminant_slice(axes[0,0], my_map, ab_grid)
@@ -360,32 +387,6 @@ def cyclic_colormap_test(a_knots, b_knots, L_max, name, show_output = False, col
 	plot_small_wave_angle_test(axes[0,2], my_map)
 	plot_small_wave_magnitude_test(axes[1,2], my_map)
 
-	if False:
-		plot_analytic_vortex_test_data(axes[2,0], my_map)
-		axes[2,0].set_title('This Map')
-
-		plot_analytic_vortex_test_data(axes[2,2], my_map, with_deuteranomaly = True)
-		axes[2,2].set_title('Deuteranomaly')
-
-	else:
-		########### sample data!
-		z_array = np.loadtxt('example_data/magnitudes.txt')
-		theta_array = np.loadtxt('example_data/theta_angles.txt')
-
-		image = my_map(theta_array*2*np.pi, z_array)
-		cvd_space = {"name": "sRGB1+CVD",
-				"cvd_type": "deuteranomaly",
-				"severity": 50}
-		deut_image = np.clip( cspace_convert(image, cvd_space, "sRGB1"),  0,1)
-
-
-		axes[2,0].imshow(image, origin = 'lower')
-		axes[2,0].set_title('This Map')
-
-		axes[2,2].imshow(deut_image, origin = 'lower')
-		axes[2,2].set_title('Deuteranomaly')
-
-
 	fig.tight_layout(pad =0.1)
 	fig.subplots_adjust(top = 0.95)
 	fig.savefig(my_map.name+'_colormap.pdf',transparent = True, dpi =1200)
@@ -395,21 +396,9 @@ def cyclic_colormap_test(a_knots, b_knots, L_max, name, show_output = False, col
 
 
 if __name__ == "__main__":
-	from colorspacious import cspace_convert
-	from colorsys import hsv_to_rgb
 
-	lab_color = cspace_convert(hsv_to_rgb(0.0,1.0,1.0),"sRGB1",  "CAM02-UCS")
-	HSV_ab_angle0 = np.arctan2(lab_color[2], lab_color[1])
-	print(lab_color, HSV_ab_angle0 * 180/pi)
+	name = 'default'
+	from example_maps import colormaps
 
-
-	## for CAM02-UCS
-	L_max = 73
-	radius = 26
-	name = 'circle-%.1f-%.1f' %(radius,L_max)
-	center = (0,0)
-	theta = np.arange(0, 2*pi, 2*pi/8)
-	a_knots = center[0] + radius*cos(theta + HSV_ab_angle0)
-	b_knots = center[1] + radius*sin(theta + HSV_ab_angle0)
-
-	cyclic_colormap_test(a_knots, b_knots, L_max, name, show_output = True)
+	my_map = colormaps[name]
+	cyclic_colormap_test(my_map, show_output = True)

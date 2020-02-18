@@ -1,0 +1,3 @@
+from .core import isoluminant_uniform_spline_colormap,  isoluminant_uniform_circle_colormap
+from .analysis import plot_knots_on_isoluminant_slice, plot_colorwheel
+from .example_maps import colormaps

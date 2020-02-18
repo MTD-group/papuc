@@ -6,8 +6,7 @@ from scipy.interpolate import splrep, splev
 
 
 
-from tools import periodic_spline, periodic_spline_test, isoluminant_uniform_spline_colormap
-from tools import HSV_colormap
+from papuc.core import periodic_spline, periodic_spline_test, isoluminant_uniform_spline_colormap, HSV_colormap
 
 if False:
 	periodic_spline_test()

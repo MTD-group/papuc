@@ -8,6 +8,12 @@ from scipy.interpolate import splrep, splev
 from colorspacious import cspace_convert
 from papuc.core import default_colorspace
 
+<<<<<<< HEAD:papuc/analysis.py
+=======
+
+from papuc import periodic_spline, periodic_spline_test
+from papuc import isoluminant_uniform_spline_colormap, default_colorspace
+>>>>>>> 14afa424c18f22245822b20e37ab20bc83bac67e:analysis.py
 
 if False:
 	periodic_spline_test()
@@ -321,8 +327,12 @@ def plot_analytic_vortex_test_data(ax, my_map, npts = 16, xmax = 1.5, ymax = 1.7
 
 
 
+<<<<<<< HEAD:papuc/analysis.py
 def cyclic_colormap_test(my_map, show_output = False, color_space = default_colorspace, ab_grid = 512):
 
+=======
+def cyclic_colormap_test(a_knots, b_knots, L_max, name, show_output = False, color_space = default_colorspace, ab_grid = 512, test_theta = None, test_magnitude = None, save_results = True):
+>>>>>>> 14afa424c18f22245822b20e37ab20bc83bac67e:analysis.py
 
 
 	print('\n-->testing %s\n'%my_map.name)
@@ -338,6 +348,7 @@ def cyclic_colormap_test(my_map, show_output = False, color_space = default_colo
 	fig.suptitle(my_map.name, fontsize = 14)
 
 
+<<<<<<< HEAD:papuc/analysis.py
 	if False:
 		plot_analytic_vortex_test_data(axes[2,0], my_map)
 		axes[2,0].set_title('This Map')
@@ -360,11 +371,44 @@ def cyclic_colormap_test(my_map, show_output = False, color_space = default_colo
 		deut_image = np.clip( cspace_convert(image, cvd_space, "sRGB1"),  0,1)
 
 
-		axes[2,0].imshow(image, origin = 'lower')
-		axes[2,0].set_title('This Map')
+=======
+	plot_knots_on_isoluminant_slice(axes[0,0], my_map, ab_grid)
 
+	plot_arc_length_vs_spline_parameter_t(axes[0,1], my_map)
+	plot_perceptual_derivative(axes[1,0], my_map,)
+	plot_perceptual_derivative(axes[1,1], my_map, use_delta_instead = True)
+
+
+	plot_colorwheel(axes[2,1], my_map)
+	plot_colorwheel(axes[2,1], my_map,
+				num_theta_levels = 32,
+				num_z_levels = 16,
+				center = (3,0),
+				radius=1.0,
+				with_side_bar = False,
+				with_deuteranomaly = True)
+
+	plot_small_wave_angle_test(axes[0,2], my_map)
+	plot_small_wave_magnitude_test(axes[1,2], my_map)
+
+	try: # this is a terrible method to test if there is data, but I'm lazy and it's clean looking
+		########### sample data!
+		image = my_map(test_theta, test_magnitude)
+		cvd_space = {"name": "sRGB1+CVD",
+				"cvd_type": "deuteranomaly",
+				"severity": 50}
+		deut_image =clip( cspace_convert(image, cvd_space, "sRGB1"),  0,1)
+		
+>>>>>>> 14afa424c18f22245822b20e37ab20bc83bac67e:analysis.py
+		axes[2,0].imshow(image, origin = 'lower')
 		axes[2,2].imshow(deut_image, origin = 'lower')
-		axes[2,2].set_title('Deuteranomaly')
+
+	except:
+		plot_analytic_vortex_test_data(axes[2,0], my_map)
+		plot_analytic_vortex_test_data(axes[2,2], my_map, with_deuteranomaly = True)
+		
+	axes[2,0].set_title('This Map')
+	axes[2,2].set_title('Deuteranomaly')
 
 
 
@@ -389,16 +433,45 @@ def cyclic_colormap_test(my_map, show_output = False, color_space = default_colo
 
 	fig.tight_layout(pad =0.1)
 	fig.subplots_adjust(top = 0.95)
-	fig.savefig(my_map.name+'_colormap.pdf',transparent = True, dpi =1200)
-	fig.savefig(my_map.name+'_colormap.svg',transparent = True, dpi =1200)
+	if save_results:
+		fig.savefig(my_map.name+'_colormap.pdf',transparent = True, dpi =1200)
+		fig.savefig(my_map.name+'_colormap.svg',transparent = True, dpi =1200)
 	########
 	if show_output:show()
 
 
 if __name__ == "__main__":
+<<<<<<< HEAD:papuc/analysis.py
 
 	name = 'default'
 	from example_maps import colormaps
 
 	my_map = colormaps[name]
 	cyclic_colormap_test(my_map, show_output = True)
+=======
+	from colorspacious import cspace_convert
+	from colorsys import hsv_to_rgb
+	from numpy import arctan2
+	lab_color = cspace_convert(hsv_to_rgb(0.0,1.0,1.0),"sRGB1",  "CAM02-UCS")
+	HSV_ab_angle0 = arctan2(lab_color[2], lab_color[1])
+	print(lab_color, HSV_ab_angle0 * 180/pi)
+
+
+	## for CAM02-UCS
+	L_max = 73
+	radius = 26
+	name = 'circle-%.1f-%.1f' %(radius,L_max)
+	center = (0,0)
+	theta = arange(0, 2*pi, 2*pi/8)
+	a_knots = center[0] + radius*cos(theta + HSV_ab_angle0)
+	b_knots = center[1] + radius*sin(theta + HSV_ab_angle0)
+
+	from numpy import loadtxt
+	test_magnitude = loadtxt('example_data/magnitudes.txt')
+	test_theta = loadtxt('example_data/theta_angles.txt')
+
+	cyclic_colormap_test(a_knots, b_knots, L_max, name, 
+		show_output = True, save_results = False,
+		test_magnitude = test_magnitude,
+		test_theta = test_theta)
+>>>>>>> 14afa424c18f22245822b20e37ab20bc83bac67e:analysis.py

@@ -3,11 +3,11 @@
 from colorspacious import cspace_convert
 from colorsys import hsv_to_rgb
 from analysis import cyclic_colormap_test
-from numpy import *
+import numpy as np
 
 jab_color = cspace_convert(hsv_to_rgb(0.0,1.0,1.0),"sRGB1",  "CAM02-UCS")
-HSV_ab_angle0 = arctan2(jab_color[2], jab_color[1])
-print(jab_color, HSV_ab_angle0 * 180/pi)
+HSV_ab_angle0 = np.arctan2(jab_color[2], jab_color[1])
+print(jab_color, HSV_ab_angle0 * 180/np.pi)
 
 
 test_all = False
@@ -32,9 +32,9 @@ L_max = 73
 radius = 26
 name = 'circle-%.1f-%.1f' %(radius,L_max)
 center = (0,0)
-theta = arange(0, 2*pi, 2*pi/8)
-a_knots = center[0] + radius*cos(theta + HSV_ab_angle0)
-b_knots = center[1] + radius*sin(theta + HSV_ab_angle0)
+theta = np.arange(0, 2*np.pi, 2*np.pi/8)
+a_knots = center[0] + radius*np.cos(theta + HSV_ab_angle0)
+b_knots = center[1] + radius*np.sin(theta + HSV_ab_angle0)
 if test_all:cyclic_colormap_test(a_knots, b_knots, L_max, name, show_output = False)
 
 #cyclic_colormap_test(a_knots, b_knots, L_max, name, show_output = True, ab_grid =512)

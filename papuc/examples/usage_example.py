@@ -28,10 +28,12 @@ plt.quiver(X, Y, U, V, units='width')
 # save the image
 plt.imsave('test_image.png', image, origin = 'lower')
 
+plt.savefig('test_figure.png')
 ### this is for looking at your colormap's color wheel
 fig, ax = plt.subplots()
 from papuc.analysis import plot_colorwheel
 plot_colorwheel(ax, my_map)
 fig.tight_layout(pad= 0.1)
+plt.savefig('test_colorwheel.png')
 
 plt.show()

@@ -8,7 +8,7 @@ def create_LUT(my_map, npts = 128, save_to_file = True):
 	xmax = 1
 	ymax = 2*np.pi
 
-	magnitude_norm, angle = np.meshgrid(np.linspace(0, xmax , xmax * npts), np.linspace(0, ymax , ymax*npts))
+	magnitude_norm, angle = np.meshgrid(np.linspace(0, xmax ,  npts), np.linspace(0, ymax , npts))
 
 	image = my_map(angle, magnitude_norm)
 	if save_to_file:

@@ -259,7 +259,27 @@ class isoluminant_uniform_spline_colormap:
 		else:
 			image = np.zeros(list(z_ar.shape)+[3])
 
-		if dims == 1:
+		if dims == 0:
+			a = self.a_func_of_theta(theta_ar)
+			b = self.b_func_of_theta(theta_ar)
+
+			lab_color = z_ar*np.array([self.L_max,a,b])
+			if scale_alpha: lab_color = np.array([self.L_max,a,b])
+
+			sRGB1_color = cspace_convert(lab_color, self.color_space, "sRGB1")
+			if clip_values:
+				if any(sRGB1_color>1) or any(sRGB1_color<0):
+					sRGB1_color_clipped =  np.clip( sRGB1_color, 0,1)
+					Lab_color_clipped = cspace_convert(sRGB1_color_clipped, "sRGB1", self.color_space)
+					if verbose:print (self.color_space+'/sRGB1 color', np.array(lab_color), '/', sRGB1_color,
+						'\n-----> clipped to',  Lab_color_clipped, '/', sRGB1_color_clipped)
+					sRGB1_color = sRGB1_color_clipped
+
+			if scale_alpha: sRGB1_color =  np.append(sRGB1_color, z_ar)
+			image = sRGB1_color
+
+
+		elif dims == 1:
 			for i in range(z_ar.shape[0]):
 				a = self.a_func_of_theta(theta_ar[i])
 				b = self.b_func_of_theta(theta_ar[i])
@@ -279,7 +299,7 @@ class isoluminant_uniform_spline_colormap:
 				if scale_alpha: sRGB1_color =  np.append(sRGB1_color, z_ar[i])
 				image[i] = sRGB1_color
 
-		if dims == 2:
+		elif dims == 2:
 			for i in range(z_ar.shape[0]):
 				for j in range(z_ar.shape[1]):
 					a = self.a_func_of_theta(theta_ar[i,j])
@@ -361,8 +381,27 @@ class isoluminant_uniform_circle_colormap:
 		else:
 			image = np.zeros(list(z_ar.shape)+[3])
 
+		if dims == 0:
+					a = self.a_func_of_theta(theta_ar )
+					b = self.b_func_of_theta(theta_ar )
 
-		if dims == 1:
+					lab_color = z_ar*np.array([self.L_max,a,b])
+					if scale_alpha: lab_color = np.array([self.L_max,a,b])
+
+					sRGB1_color = cspace_convert(lab_color, self.color_space , "sRGB1")
+					if clip_values:
+						if any(sRGB1_color>1) or any(sRGB1_color<0):
+							sRGB1_color_clipped = np.clip( sRGB1_color, 0,1)
+							Lab_color_clipped = cspace_convert(sRGB1_color_clipped, "sRGB1", self.color_space )
+							print (self.color_space +'/sRGB1 color', np.array(lab_color), '/', sRGB1_color,
+								'\n-----> clipped to',  Lab_color_clipped, '/', sRGB1_color_clipped)
+							sRGB1_color = sRGB1_color_clipped
+
+					if scale_alpha: sRGB1_color =  np.append(sRGB1_color, z_ar)
+					image = sRGB1_color
+
+
+		elif dims == 1:
 			for i in range(z_ar.shape[0]):
 					a = self.a_func_of_theta(theta_ar[i] )
 					b = self.b_func_of_theta(theta_ar[i] )
@@ -383,7 +422,7 @@ class isoluminant_uniform_circle_colormap:
 					image[i] = sRGB1_color
 
 
-		if dims == 2:
+		elif dims == 2:
 			for i in range(z_ar.shape[0]):
 				for j in range(z_ar.shape[1]):
 					a = self.a_func_of_theta(theta_ar[i,j] )
@@ -409,7 +448,7 @@ class isoluminant_uniform_circle_colormap:
 def HSV_colormap(theta, z, scale_alpha = False, clip_values = True, verbose = True):
 	from colorsys import hsv_to_rgb, rgb_to_hsv
 	z_ar = np.array(z)
-	theta_ar =  np.array(theta)/(2*np.pi)
+	theta_ar =  np.array(theta)
 
 	dims = len(z_ar.shape)
 
@@ -418,8 +457,25 @@ def HSV_colormap(theta, z, scale_alpha = False, clip_values = True, verbose = Tr
 	else:
 		image = np.zeros(list(z_ar.shape)+[3])
 
+	if dims == 0:
 
-	if dims == 1:
+		HSV_color = [theta_ar ,1.0, z_ar ]
+		if scale_alpha: HSV_color[2] = 0.0
+		sRGB1_color = np.array(hsv_to_rgb(*HSV_color))
+
+		if clip_values:
+			if any(sRGB1_color>1) or any(sRGB1_color<0):
+				sRGB1_color_clipped = np.clip( sRGB1_color, 0,1)
+				HSV_color_clipped = rgb_to_hsv(*sRGB1_color_clipped)
+				if verbose:print ('HSV/sRGB1 color', HSV_color, '/', sRGB1_color,
+						'\n-----> clipped to',  HSV_color_clipped, '/', sRGB1_color_clipped)
+				sRGB1_color = sRGB1_color_clipped
+
+		if scale_alpha: sRGB1_color =  np.append(sRGB1_color, z_ar)
+		image = sRGB1_color
+
+
+	elif dims == 1:
 		for i in range(z_ar.shape[0]):
 
 			HSV_color = [theta_ar[i] ,1.0, z_ar[i] ]
@@ -438,7 +494,7 @@ def HSV_colormap(theta, z, scale_alpha = False, clip_values = True, verbose = Tr
 			image[i] = sRGB1_color
 
 
-	if dims == 2:
+	elif dims == 2:
 		for i in range(z_ar.shape[0]):
 			for j in range(z_ar.shape[1]):
 

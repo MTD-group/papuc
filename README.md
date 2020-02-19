@@ -91,3 +91,6 @@ plt.show()
 Which will look like this:
 
 ![colormap_knots](papuc/examples/colormap_path_knots.png)
+
+Check the example *simple_analysis_example.py* to see more options and a more thorough analysis.
+

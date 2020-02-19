@@ -1,5 +1,5 @@
 # Phase-Amplitude Perceptually Uniform Colormap Designer (papuc) ##
-Papuc small library designed for creating perceptually uniform color mappings for vector fields where vector orientations/phase angles are mapped onto hue and vector magnitude/amplitude is mapped onto lightness. papuc is designed to integrate into the Matplotlib/NumPy ecosystem and relies on [colorspacious](https://colorspacious.readthedocs.io/en/latest/) for colorspace transformations. 
+Papuc is a small library designed for creating perceptually uniform color mappings of vector fields where vector orientations/phase angles are mapped onto hue and vector magnitudes/amplitudes are mapped onto lightness. papuc is designed to integrate into the Matplotlib/NumPy ecosystem and relies on [colorspacious](https://colorspacious.readthedocs.io/en/latest/) for colorspace transformations. 
 
 ## Why? ##
 Simply put, many people use the [HSV color wheel](https://en.wikipedia.org/wiki/HSL_and_HSV) for colormaping phase and amplitude. The HSV color wheel is handy for artists picking color palletes, but has serious failings as a color mapping for data visualization.   
@@ -9,6 +9,12 @@ Our paper exploring the concepts, the improvements over HSV, and a usecase are [
 
 ## Basic Usage ##
 If you just want to use a resonably good color map on your angle and magnitude data, our usage_example.py should be all you need. 
+```
+>>> from numpy import pi
+>>> from papuc.example_maps import colormaps
+>>> my_map = colormaps['default']
+
+
 ## A Feature Complete Example ##
 We start by creating some test data:
 ```python
@@ -58,3 +64,6 @@ plt.show()
 ```
 Which looks like this:
 
+![test_figure](/papuc/examples/test_figure.png)
+
+![test_colorwheel](/papuc/examples/test_colorwheel.png)

@@ -89,3 +89,4 @@ plot_knots_on_isoluminant_slice(ax, my_map)
 plt.show()
 ```
 Which will look like this:
+![colormap_knots](papuc/examples/colormap_path_knots.png)

@@ -21,18 +21,18 @@ from papuc.analysis import cyclic_colormap_test, plot_knots_on_isoluminant_slice
 
 fig, ax = plt.subplots()
 plot_knots_on_isoluminant_slice(ax, my_map)
-
+fig.savefig('colormap_path_knots.png')
 
 # the size can be maximized later too!
 fig, ax = plt.subplots()
 my_map.maximize_radius()
 plot_knots_on_isoluminant_slice(ax, my_map)
-
+fig.savefig('colormap_path_knots_maximized.png')
 
 
 
 # Enable this if you want to do a more rigorous analysis, it make take a minute to run though
 cyclic_colormap_test(my_map)
-
+fig.savefig('colormap_analyzed.png')
 
 plt.show()

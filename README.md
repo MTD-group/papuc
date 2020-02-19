@@ -9,7 +9,7 @@ Our paper exploring the concepts, the improvements over HSV, and a usecase are [
 
 ## Basic Usage ##
 To get the color of a single point with an angle of 225 degrees and normalized magnitude of 0.8, it only takes 3 lines:
-```
+```python
 >>> from numpy import pi
 >>> from papuc.example_maps import colormaps
 >>> my_map = colormaps['default']

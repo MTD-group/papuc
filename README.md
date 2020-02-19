@@ -8,15 +8,17 @@ Simply put, many people use the [HSV color wheel](https://en.wikipedia.org/wiki/
 Our paper exploring the concepts, the improvements over HSV, and a usecase are [here](Will_be_on_ArXiv_soon)
 
 ## Basic Usage ##
-If you just want to use a resonably good color map on your angle and magnitude data, our usage_example.py should be all you need. 
+To get the color of a single point with an angle of 225 degrees and normalized magnitude of 0.8, it only takes 3 lines:
 ```
 >>> from numpy import pi
 >>> from papuc.example_maps import colormaps
 >>> my_map = colormaps['default']
-
+>>> my_map(225 * pi/180,  0.8 )
+array([0.43373149, 0.52916728, 0.7263222])
+```
 
 ## A Feature Complete Example ##
-We start by creating some test data:
+If you just want to use a resonably good color map on your angle and magnitude data, our usage_example.py should be all you need. We start by creating some test data:
 ```python
 from matplotlib import pyplot as plt
 import numpy as np
@@ -67,3 +69,23 @@ Which looks like this:
 ![test_figure](/papuc/examples/test_figure.png)
 
 ![test_colorwheel](/papuc/examples/test_colorwheel.png)
+
+## Defining a Colormap with Knots ##
+If you want to make your own isoluminant path, you'll start with the periodic spline knots:
+```python
+from papuc import isoluminant_uniform_spline_colormap
+#### define a color map with knot points
+L_max = 85 #   0   1    2    3    4    5
+a_knots =  [  -6,  16,  15,  0,  -22, -22]
+b_knots =  [ -15, -13,  -3,  0,   -1, -10]
+my_map = isoluminant_uniform_spline_colormap( a_knots, b_knots, L_max)
+```
+Now you have a color map defined by those points! To see the path in the a, b plane:
+```python
+from matplotlib import pyplot as plt
+from papuc.analysis import plot_knots_on_isoluminant_slice
+fig, ax = plt.subplots()
+plot_knots_on_isoluminant_slice(ax, my_map)
+plt.show()
+```
+Which will look like this:

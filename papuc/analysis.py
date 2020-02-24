@@ -7,6 +7,7 @@ from scipy.interpolate import splrep, splev
 
 from colorspacious import cspace_convert
 from papuc.core import default_colorspace
+from papuc.plot_3d import UCS_cone_3D
 
 
 if False:

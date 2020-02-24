@@ -17,7 +17,7 @@ my_map = isoluminant_uniform_spline_colormap(
 
 
 ###### now for a basic path plot
-from papuc.analysis import cyclic_colormap_test, plot_knots_on_isoluminant_slice
+from papuc.analysis import cyclic_colormap_test, plot_knots_on_isoluminant_slice, UCS_cone_3D
 
 fig, ax = plt.subplots()
 plot_knots_on_isoluminant_slice(ax, my_map)
@@ -29,10 +29,15 @@ my_map.maximize_radius()
 plot_knots_on_isoluminant_slice(ax, my_map)
 fig.savefig('colormap_path_knots_maximized.png')
 
-
+# a nice 3D view
+fig = plt.figure()
+ax = fig.gca(projection='3d')
+UCS_cone_3D(ax,  my_map)
+fig.savefig('colormap_3D_view.png')
 
 # Enable this if you want to do a more rigorous analysis, it make take a minute to run though
-cyclic_colormap_test(my_map)
-fig.savefig('colormap_analyzed.png')
+if False:
+    cyclic_colormap_test(my_map)
+    fig.savefig('colormap_analyzed.png')
 
 plt.show()

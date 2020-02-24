@@ -57,10 +57,16 @@ plt.savefig('test_figure.png')
 
 ## this is for looking at your colormap's color wheel
 fig, ax = plt.subplots()
-from papuc.analysis import plot_colorwheel
+from papuc.analysis import plot_colorwheel,  UCS_cone_3D
 plot_colorwheel(ax, my_map)
 fig.tight_layout(pad= 0.1)
 plt.savefig('test_colorwheel.png')
+
+## a nice 3D view
+fig = plt.figure()
+ax = fig.gca(projection='3d')
+UCS_cone_3D(ax,  my_map)
+fig.savefig('test_colormap_3D_view.png')
 
 plt.show()
 ```
@@ -68,7 +74,7 @@ Which looks like this:
 
 ![test_figure](/papuc/examples/test_figure.png)
 
-![test_colorwheel](/papuc/examples/test_colorwheel.png)
+<img src="/papuc/examples/test_colorwheel.png" width="400" ><img src="/papuc/examples/test_colormap_3D_view.png" width="400" >
 
 ## Defining a Colormap with Knots ##
 If you want to make your own isoluminant path, you'll start with the periodic spline knots:

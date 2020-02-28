@@ -5,7 +5,7 @@ papuc is a small library designed for creating perceptually uniform color mappin
 Simply put, many people use the [HSV color wheel](https://en.wikipedia.org/wiki/HSL_and_HSV) for colormaping phase and amplitude. The HSV color wheel is handy for artists picking color palletes, but has serious shortcomings as a color mapping for data visualization.   
 
 ## Citing Papuc ##
-Our paper exploring the concepts, the improvements over HSV, and a case study are [here](Will_be_on_ArXiv_soon).
+Our paper exploring the concepts, the improvements over HSV, and a case study are [here](https://arxiv.org/abs/2002.12228).
 
 [![DOI](https://zenodo.org/badge/172240609.svg)](https://zenodo.org/badge/latestdoi/172240609)
 

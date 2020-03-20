@@ -13,7 +13,7 @@ angle = np.arctan2(V,U)
 magnitude = np.sqrt(V**2 + U**2)
 magnitude_norm = magnitude/magnitude.max()
 
-###### Now for visualization 
+###### Now for visualization
 from papuc.example_maps import colormaps
 my_map = colormaps['default']
 

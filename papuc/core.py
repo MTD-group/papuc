@@ -259,7 +259,7 @@ class isoluminant_uniform_spline_colormap:
 		else:
 			image = np.zeros(list(z_ar.shape)+[3])
 
-		if dims == 0:
+		if dims == 0: # single pixel
 			a = self.a_func_of_theta(theta_ar)
 			b = self.b_func_of_theta(theta_ar)
 
@@ -278,7 +278,40 @@ class isoluminant_uniform_spline_colormap:
 			if scale_alpha: sRGB1_color =  np.append(sRGB1_color, z_ar)
 			image = sRGB1_color
 
+		elif dims >= 1: # testing a more numpy friendly, faster code
+			lab_image = np.zeros(list(z_ar.shape)+[3])
+			lab_image[..., 0] = self.L_max
+			lab_image[..., 1] = self.a_func_of_theta(theta_ar)
+			lab_image[..., 2] = self.b_func_of_theta(theta_ar)
+			if scale_alpha == False: # this is the normal form
+				for i in range(3):
+					lab_image[...,i] *= z_ar
 
+			sRGB1_image = cspace_convert(lab_image, self.color_space , "sRGB1")
+
+			if clip_values:
+				sRGB1_image_clipped = np.clip(sRGB1_image,0,1)
+				if verbose:
+					out_of_gamut = np.any(sRGB1_image>1, axis = -1 ) | np.any(sRGB1_image<0, axis = -1 )
+					out_of_gamut_points = sRGB1_image[out_of_gamut]
+					out_of_gamut_points = out_of_gamut_points.reshape((out_of_gamut_points.size//3,3))
+					for i in range(out_of_gamut_points.shape[0]):
+						sRGB1_color = out_of_gamut_points[i]
+						sRGB1_color_clipped = np.clip(sRGB1_color,0,1)
+						Lab_color = cspace_convert(sRGB1_color, "sRGB1", self.color_space )
+						Lab_color_clipped = cspace_convert(sRGB1_color_clipped, "sRGB1", self.color_space )
+						print ('L*a*b*/sRGB1 color', Lab_color, '/', sRGB1_color,
+							'\n-----> clipped to',  Lab_color_clipped, '/', sRGB1_color_clipped)
+
+				image[...,0:3] = np.clip(sRGB1_image_clipped,0,1)
+			else:
+				image[...,0:3] = sRGB1_image
+
+			if scale_alpha:
+				image[..., 3] =  z_ar
+
+
+		######## lazy deprication? old and slow
 		elif dims == 1:
 			for i in range(z_ar.shape[0]):
 				a = self.a_func_of_theta(theta_ar[i])
@@ -319,7 +352,6 @@ class isoluminant_uniform_spline_colormap:
 
 					if scale_alpha: sRGB1_color =  np.append(sRGB1_color, z_ar[i,j])
 					image[i,j] = sRGB1_color
-
 		return image
 
 

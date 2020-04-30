@@ -18,3 +18,5 @@ from .analysis import (plot_analytic_vortex_test_data,
 
 from .plot_3d     import UCS_cone_3D
 from .plot_hsv_3d import hsv_UCS_cone_3D
+from .LUT import create_LUT
+

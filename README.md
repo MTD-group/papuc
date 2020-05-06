@@ -9,6 +9,16 @@ Our paper exploring the concepts, the improvements over HSV, and a case study ar
 
 [![DOI](https://zenodo.org/badge/172240609.svg)](https://zenodo.org/badge/latestdoi/172240609)
 
+## Installation ### 
+
+Clone the git repo with:
+```
+git clone https://github.com/MTD-group/papuc.git
+```
+And then append your python path in your .bashrc or .bash_profile file with the path to papuc:
+```
+export PYTHONPATH=$PYTHONPATH:THE/PATH/TO/papuc
+```
 
 ## Basic Usage ##
 To get the color of a single point with an angle of 225 degrees and normalized magnitude of 0.8, it only takes 3 lines:
@@ -19,6 +29,7 @@ To get the color of a single point with an angle of 225 degrees and normalized m
 >>> my_map(225 * pi/180,  0.8 )
 array([0.43373149, 0.52916728, 0.7263222])
 ```
+Any pair of angle and magnitude ndarrays with matching dimensions can be used in ```my_map(angle, magnitude)``` and an N+1 dimensional ndarray of sRGB1 colors will be returned.
 
 ## A Feature Complete Example ##
 If you just want to use a resonably good color map on your angle and magnitude data, our usage_example.py should be all you need. We start by creating some test data:

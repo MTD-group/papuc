@@ -29,7 +29,7 @@ To get the color of a single point with an angle of 225 degrees and normalized m
 >>> my_map(225 * pi/180,  0.8 )
 array([0.43373149, 0.52916728, 0.7263222])
 ```
-Any pair of angle and magnitude ndarrays with matching dimensions can be used in ```my_map(angle, magnitude)``` and an N+1 dimensional ndarray of sRGB1 colors will be returned.
+Any pair of angle and magnitude ndarrays with matching dimensions can be used in ```my_map(angle, magnitude)``` and an N+1-dimensional ndarray of sRGB1 colors will be returned.
 
 ## A Feature Complete Example ##
 If you just want to use a resonably good color map on your angle and magnitude data, our usage_example.py should be all you need. We start by creating some test data:

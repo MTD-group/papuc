@@ -31,6 +31,15 @@ array([0.43373149, 0.52916728, 0.7263222])
 ```
 Any pair of angle and magnitude ndarrays with matching dimensions can be used in ```my_map(angle, magnitude)``` and an N+1-dimensional ndarray of sRGB1 colors will be returned.
 
+## Creating a LUT for Other Plotting Software ##
+To create look up table(s) (LUT) to use in other plotting software, it's as simple as:
+
+```python
+from papuc import create_LUT
+image = create_LUT(my_map, npts = 32, save_to_file = True)
+```
+This will create plain text tables of the red, green, and blue values in 32x32 tables of angle and magnitude. It will also store the same data as a PNG file for a more compact representation. 
+
 ## A Feature Complete Example ##
 If you just want to use a resonably good color map on your angle and magnitude data, our usage_example.py should be all you need. We start by creating some test data:
 ```python

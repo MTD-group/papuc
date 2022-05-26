@@ -23,14 +23,17 @@ center = (0,0)
 theta = np.arange(0, 2*np.pi, 2*np.pi/8)
 a_knots = center[0] + radius*np.cos(theta + HSV_ab_angle0)
 b_knots = center[1] + radius*np.sin(theta + HSV_ab_angle0)
-map = isoluminant_uniform_spline_colormap(a_knots, b_knots, L_max)
+map = isoluminant_uniform_spline_colormap(a_knots, b_knots, L_max, name=name)
 colormaps[name] = map
-colormaps['default'] = map
+# this is also the default map
+name = 'default'
+map = isoluminant_uniform_spline_colormap(a_knots, b_knots, L_max, name=name)
+colormaps[name] = map
 
 
 
 
-
+# Automatically scales a and b at the top to be as wide as possible while fitting in the sRGB gamut
 L_max = 73
 radius = 25 # will get rescaled later
 name = 'max-circle-%i' %(L_max)
@@ -41,7 +44,7 @@ center = (0,0)
 theta = np.arange(0, 2*np.pi, 2*np.pi/8)
 a_knots = center[0] + radius*np.cos(theta + HSV_ab_angle0)
 b_knots = center[1] + radius*np.sin(theta + HSV_ab_angle0)
-map = isoluminant_uniform_spline_colormap(a_knots, b_knots, L_max, maximize_radius = True, verbose = False)
+map = isoluminant_uniform_spline_colormap(a_knots, b_knots, L_max, maximize_radius = True, verbose = False, name=name)
 colormaps[name] = map
 if __name__ == '__main__':
     print('optimal radius found', np.sqrt(np.mean(map.a_knots**2 + map.b_knots**2)))
@@ -56,7 +59,7 @@ name = 'bean5'
 L_max = 75 #   0   1    2    3    4    5
 a_knots =  [   0,  23,  26,  0, -23, -22]
 b_knots =  [ -24, -19,  -3,  0,  25, -15]
-map = isoluminant_uniform_spline_colormap(a_knots, b_knots, L_max, maximize_radius = True)
+map = isoluminant_uniform_spline_colormap(a_knots, b_knots, L_max, maximize_radius = True, name=name)
 colormaps[name] = map
 
 
@@ -72,5 +75,5 @@ amin, amax = -30, 30
 bmin, bmax = -30, 30
 a_knots = randint(amin, amax, size = knots)
 b_knots = randint(bmin, bmax, size = knots)
-map = isoluminant_uniform_spline_colormap(a_knots, b_knots, L_max)
+map = isoluminant_uniform_spline_colormap(a_knots, b_knots, L_max, name=name)
 colormaps[name] = map
